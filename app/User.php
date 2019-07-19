@@ -10,23 +10,39 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'username', 'email', 'password',
     ];
 
     protected $hidden = [
         'password', 'remember_token',
     ];
 
-    protected $appends = ['profileLink'];
+    protected $appends = ['profileLink','followLink','unfollowLink'];
+
+    //protected $primaryKey = 'username';
 
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
 
+    public function likes(){
+        return $this->belongsToMany(Post::class,'post_likes','user_id','post_id');
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(User::class,'followers','follower_id','user_id');
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class,'followers','user_id','follower_id');
+    }
+
     public function getRouteKeyName()
     {
-        return 'name';
+        return 'username';
     }
 
     public function getProfileLinkAttribute()
@@ -34,9 +50,14 @@ class User extends Authenticatable
         return route('user.show', $this);
     }
 
-    public function following()
+    public function getFollowLinkAttribute()
     {
-        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+        return route('user.follow', $this);
+    }
+
+    public function getUnfollowLinkAttribute()
+    {
+        return route('user.unfollow', $this);
     }
 
     public function isNot($user)
@@ -46,7 +67,7 @@ class User extends Authenticatable
 
     public function isFollowing($user)
     {
-        return (bool) $this->following->where('id', $user->id)->count();
+        return (bool) $this->following()->where('user_id', $user->id)->count();
     }
 
     public function canFollow($user)
@@ -61,5 +82,7 @@ class User extends Authenticatable
     {
         return $this->isFollowing($user);
     }
+
+
 
 }
