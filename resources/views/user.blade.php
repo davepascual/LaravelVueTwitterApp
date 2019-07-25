@@ -4,15 +4,24 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h3>{{ $user->name }}</h3>
-            @if(auth()->user()->isNot($user))
-                @if(auth()->user()->isFollowing($user))
-                    <a href="{{ route('user.unfollow', $user) }}" class="btn btn-danger">No Follow</a>
-                @else
-                    <a href="{{ route('user.follow', $user) }}" class="btn btn-success">Follow</a>
+            <div class="float-right">
+
+                @if(auth()->user()->isNot($user))
+                    @if(auth()->user()->isFollowing($user))
+                        <a href="{{ route('user.unfollow', $user) }}" class="btn btn-danger">x Unfollow</a>
+                    @else
+                        <a href="{{ route('user.follow', $user) }}" class="btn btn-outline-success">+Follow</a>
+                    @endif
                 @endif
-            @endif
+            </div>
+            <h3>{{ $user->name }}</h3>
+            <h6>@ {{ $user->username }}</h6>
+            
+
         </div>
+
+        <user-post-component></user-post-component>
+        
     </div>
 </div>
 @endsection
